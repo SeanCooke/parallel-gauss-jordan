@@ -1,0 +1,23 @@
+#!/bin/bash
+DATA_FILE=$1
+T=$2
+GAUSS_SEQUENTIAL_CMD='./gauss-sequential '$DATA_FILE
+GAUSS_CILK_CMD='./gauss-cilk '$DATA_FILE' -t '
+GAUSS_OPENMP_CMD='./gauss-openmp '$DATA_FILE' -t '
+clear
+rm -f gauss-data.tsv
+touch gauss-data.tsv
+echo "Function Name	Threads	Seconds	Error" >> gauss-data.tsv
+make gauss
+$GAUSS_SEQUENTIAL_CMD >> gauss-data.tsv
+echo $GAUSS_SEQUENTIAL_CMD
+for t in `seq 2 $T`;
+do
+	CURRENT_CMD=$GAUSS_CILK_CMD$t
+	$CURRENT_CMD >> gauss-data.tsv
+	echo $CURRENT_CMD
+        CURRENT_CMD=$GAUSS_OPENMP_CMD$t
+        $CURRENT_CMD >> gauss-data.tsv
+        echo $CURRENT_CMD	
+done
+make clean
